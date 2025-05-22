@@ -8,16 +8,13 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy via SSH
-        uses: cross-the-world/ssh-scp-ssh-pipelines@v1.1.4
+      - name: SSH Command to Deploy
+        uses: D3rHase/ssh-command-action@v0.3.1
         with:
           host: ${{ secrets.SSH_HOST }}
           port: 22
           user: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          connect_timeout: 30s
-          first_ssh: |
-            whoami
-            hostname
+          private_key: ${{ secrets.SSH_KEY }}
+          command: |
             cd /var/www/html/esp32-web
             git pull

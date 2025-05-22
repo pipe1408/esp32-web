@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +14,7 @@
             border: 2px solid #000;
             margin-bottom: 15px;
         }
-        
+
         .room {
             position: absolute;
             border: 1px solid #000;
@@ -24,46 +25,46 @@
             text-align: center;
             background-color: #f8f9fa;
         }
-        
+
         .room.on {
             background-color: #ffc107;
         }
-        
+
         .bedroom {
             top: 0;
             left: 0;
             width: 33%;
             height: 40%;
         }
-        
+
         .bathroom {
             top: 0;
             left: 33%;
             width: 20%;
             height: 40%;
         }
-        
+
         .sala {
             top: 0;
             left: 53%;
             width: 47%;
             height: 100%;
         }
-        
+
         .cocina {
             top: 70%;
             left: 0;
             width: 33%;
             height: 30%;
         }
-        
+
         .comedor {
             top: 70%;
             left: 33%;
             width: 20%;
             height: 30%;
         }
-        
+
         .persiana-indicator {
             position: absolute;
             right: 0;
@@ -77,28 +78,30 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .persiana-indicator span {
             transform: rotate(90deg);
             white-space: nowrap;
         }
-        
+
         .persiana-down {
             background-color: #0d6efd;
             color: white;
         }
     </style>
 </head>
+
 <body class="container py-3">
     <h1 class="text-center mb-3">Casa ESP32</h1>
-    <p class= "text-center"><strong><span id="temp">--</span>°C</strong></p>
+    <p class="text-center"><strong><span id="temp">--</span>°C</strong></p>
     <p>Juliana Espinel, Laura Franco, Felipe Ballesteros</p>
 
     <div class="mb-3">
         <a href="/log" class="btn btn-warning">Ver Registro</a>
+        <button id="logoutBtn" class="btn btn-danger">Cerrar sesión</button>
     </div>
 
-    
+
     <div class="floor-plan mb-3">
         <div class="room bedroom" id="room">Room</div>
         <div class="room bathroom" id="bath">Bathroom</div>
@@ -109,7 +112,7 @@
         <div class="room cocina" id="cocina">Cocina</div>
         <div class="room comedor" id="comedor">Comedor</div>
     </div>
-    
+
     <div class="row g-2">
         <div class="col-6">
             <div class="card">
@@ -120,7 +123,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-6">
             <div class="card">
                 <div class="card-body">
@@ -130,7 +133,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-6">
             <div class="card">
                 <div class="card-body">
@@ -140,7 +143,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-6">
             <div class="card">
                 <div class="card-body">
@@ -150,7 +153,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-6">
             <div class="card">
                 <div class="card-body">
@@ -160,7 +163,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-6">
             <div class="card">
                 <div class="card-body">
@@ -171,10 +174,10 @@
             </div>
         </div>
     </div>
-    
+
     <script>
         let persianaState = 'up';
-        
+
         function controlLight(room, isOn) {
             const action = isOn ? 'on' : 'off';
             const url = `/${room}-${action}`;
@@ -184,18 +187,18 @@
                     console.error('Error:', error);
                 });
         }
-        
+
         function controlPersiana(direction) {
             const url = `/persiana-${direction}`;
             persianaState = direction;
-            
+
             const persianaIndicator = document.getElementById('persiana-indicator');
             if (direction === 'down') {
                 persianaIndicator.classList.add('persiana-down');
             } else {
                 persianaIndicator.classList.remove('persiana-down');
             }
-            
+
             fetch(url)
                 .catch(error => {
                     console.error('Error:', error);
@@ -204,18 +207,60 @@
 
         function fetchTemperature() {
             fetch('/temperature')
-            .then(response => response.text())
-            .then(temp => {
-                document.getElementById('temp').textContent = temp;
-            })
-            .catch(err => {
-                document.getElementById('temp').textContent = 'Error';
-                console.error("Error fetching temperature:", err);
-            });
+                .then(response => response.text())
+                .then(temp => {
+                    document.getElementById('temp').textContent = temp;
+                })
+                .catch(err => {
+                    document.getElementById('temp').textContent = 'Error';
+                    console.error("Error fetching temperature:", err);
+                });
         }
 
         setInterval(fetchTemperature, 5000);
         fetchTemperature();
     </script>
+
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBp5ot70jsbajD9bbMLl6EnWOpCDlnD7AU",
+            authDomain: "esp32-db-460602.firebaseapp.com",
+            projectId: "esp32-db-460602",
+            storageBucket: "esp32-db-460602.firebasestorage.app",
+            messagingSenderId: "609313224766",
+            appId: "1:609313224766:web:c2ec3991ffdfc5f49cf96f"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Check authentication state
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                // User is not logged in, redirect to login page
+                window.location.href = "index.html";
+            }
+            // else: User is logged in, allow access
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                window.location.href = "index.html";
+            } catch (error) {
+                console.error("Error signing out:", error);
+                alert("Error al cerrar sesión");
+            }
+        });
+
+        // Add logout button to your HTML and call this function
+    </script>
 </body>
+
 </html>

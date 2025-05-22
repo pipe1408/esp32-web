@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -10,94 +11,149 @@
     body {
       background-color: #effcb9;
     }
+
     .register-container {
       max-width: 450px;
       margin: 50px auto;
       padding: 30px;
       background-color: white;
       border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
     }
+
     .btn-green {
       background-color: #6B8E23;
       color: white;
     }
+
     .btn-green:hover {
       background-color: #5a7c1e;
       color: white;
     }
   </style>
 </head>
+
 <body>
 
-<div class="container">
-  <div class="register-container">
-    <h4 class="text-center mb-4">Crear Cuenta</h4>
-    <form id="registerForm">
-      <div class="mb-3">
-        <label for="fullname" class="form-label">Nombre completo</label>
-        <input type="text" class="form-control" id="fullname" placeholder="Ingresa tu nombre">
-      </div>
-      <div class="mb-3">
-        <label for="username" class="form-label">Nombre de usuario</label>
-        <input type="text" class="form-control" id="username" placeholder="usuario123">
-      </div>
-      <div class="mb-3">
-        <label for="password" class="form-label">Contraseña</label>
-        <input type="password" class="form-control" id="password" placeholder="Crea una contraseña">
-      </div>
-      <div class="mb-3">
-        <label for="confirmPassword" class="form-label">Confirmar contraseña</label>
-        <input type="password" class="form-control" id="confirmPassword" placeholder="Repite la contraseña">
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Rol</label>
-        <div>
-          <input type="radio" id="rolAdulto" name="rol" value="adulto" checked>
-          <label for="rolAdulto">Adulto</label>
+  <div class="container">
+    <div class="register-container">
+      <h4 class="text-center mb-4">Crear Cuenta</h4>
+      <form id="registerForm">
+        <div class="mb-3">
+          <label for="fullname" class="form-label">Nombre completo</label>
+          <input type="text" class="form-control" id="fullname" placeholder="Ingresa tu nombre">
         </div>
-        <div>
-          <input type="radio" id="rolNiño" name="rol" value="niño">
-          <label for="rolNino">Niño</label>
+        <div class="mb-3">
+          <label for="username" class="form-label">Nombre de usuario</label>
+          <input type="text" class="form-control" id="username" placeholder="usuario123">
         </div>
-      </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Contraseña</label>
+          <input type="password" class="form-control" id="password" placeholder="Crea una contraseña">
+        </div>
+        <div class="mb-3">
+          <label for="confirmPassword" class="form-label">Confirmar contraseña</label>
+          <input type="password" class="form-control" id="confirmPassword" placeholder="Repite la contraseña">
+        </div>
 
-      <div id="error" class="text-danger mb-3"></div>
-      <button type="submit" class="btn w-100" style="background-color: #255c35; color: white;">Registrarse</button>
+        <div class="mb-3">
+          <label class="form-label">Rol</label>
+          <div>
+            <input type="radio" id="rolAdulto" name="rol" value="adulto" checked>
+            <label for="rolAdulto">Adulto</label>
+          </div>
+          <div>
+            <input type="radio" id="rolNiño" name="rol" value="niño">
+            <label for="rolNino">Niño</label>
+          </div>
+        </div>
 
-      <div class="text-center mt-3">
-        <a href="index.html">¿Ya tienes cuenta? Inicia sesión</a>
-      </div>
-    </form>
+        <div id="error" class="text-danger mb-3"></div>
+        <button type="submit" class="btn w-100" style="background-color: #255c35; color: white;">Registrarse</button>
+
+        <div class="text-center mt-3">
+          <a href="index.html">¿Ya tienes cuenta? Inicia sesión</a>
+        </div>
+      </form>
+    </div>
   </div>
-</div>
 
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Validación básica -->
-  <script>
-    document.getElementById("registerForm").addEventListener("submit", function(e) {
+  <script type="module">
+    // Import Firebase modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBp5ot70jsbajD9bbMLl6EnWOpCDlnD7AU",
+      authDomain: "esp32-db-460602.firebaseapp.com",
+      projectId: "esp32-db-460602",
+      storageBucket: "esp32-db-460602.firebasestorage.app",
+      messagingSenderId: "609313224766",
+      appId: "1:609313224766:web:c2ec3991ffdfc5f49cf96f"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Get form element
+    const registerForm = document.getElementById("registerForm");
+
+    // Form submission handler
+    registerForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+
       const name = document.getElementById("fullname").value.trim();
-      const user = document.getElementById("username").value.trim();
+      const email = document.getElementById("username").value.trim(); // Using username as email
       const pass = document.getElementById("password").value;
       const confirm = document.getElementById("confirmPassword").value;
       const error = document.getElementById("error");
 
-      if (!name || !email || !user || !pass || !confirm) {
+      // Validation
+      if (!name || !email || !pass || !confirm) {
         error.textContent = "Por favor, completa todos los campos.";
-      } else if (pass !== confirm) {
+        return;
+      }
+
+      if (pass !== confirm) {
         error.textContent = "Las contraseñas no coinciden.";
-      } else {
-        error.textContent = "";
-        alert("Cuenta creada correctamente para " + name );
-        // BASE DE DATOOOOOOOOOOS
+        return;
+      }
+
+      try {
+        // Create user with Firebase Auth
+        const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+        const user = userCredential.user;
+
+        // Success - redirect to main page
+        alert("Cuenta creada correctamente para " + name);
+        window.location.href = "main.html";
+      } catch (error) {
+        // Handle errors
+        const errorCode = error.code;
+        const errorMessage = error.message;
+
+        let displayMessage = "Error al registrarse: ";
+        if (errorCode === 'auth/email-already-in-use') {
+          displayMessage += "El correo ya está en uso";
+        } else if (errorCode === 'auth/weak-password') {
+          displayMessage += "La contraseña debe tener al menos 6 caracteres";
+        } else if (errorCode === 'auth/invalid-email') {
+          displayMessage += "El correo electrónico no es válido";
+        } else {
+          displayMessage += errorMessage;
+        }
+
+        error.textContent = displayMessage;
       }
     });
   </script>
 
 </body>
+
 </html>

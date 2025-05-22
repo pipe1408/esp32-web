@@ -180,7 +180,7 @@
 
         function controlLight(room, isOn) {
             const action = isOn ? 'on' : 'off';
-            const url = `house.savannahsbottler.lol/${room}-${action}`;
+            const url = `https://house.savannahsbottler.lol/${room}-${action}`;
             document.getElementById(room).classList.toggle('on', isOn);
             fetch(url)
                 .catch(error => {
@@ -189,7 +189,7 @@
         }
 
         function controlPersiana(direction) {
-            const url = `house.savannahsbottler.lol/persiana-${direction}`;
+            const url = `https://house.savannahsbottler.lol/persiana-${direction}`;
             persianaState = direction;
 
             const persianaIndicator = document.getElementById('persiana-indicator');
@@ -206,7 +206,7 @@
         }
 
         function fetchTemperature() {
-            fetch('house.savannahsbottler.lol/temperature')
+            fetch('https://house.savannahsbottler.lol/temperature')
                 .then(response => response.text())
                 .then(temp => {
                     document.getElementById('temp').textContent = temp;

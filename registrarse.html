@@ -59,12 +59,16 @@
         <div class="mb-3">
           <label class="form-label">Rol</label>
           <div>
-            <input type="radio" id="rolAdulto" name="rol" value="adulto" checked>
-            <label for="rolAdulto">Adulto</label>
+            <input type="radio" id="rolPadre" name="rol" value="adulto" checked>
+            <label for="rolPadre">Padre</label>
           </div>
           <div>
-            <input type="radio" id="rolNiño" name="rol" value="niño">
-            <label for="rolNino">Niño</label>
+            <input type="radio" id="rolMadre" name="rol" value="adulto">
+            <label for="rolMadre">Madre</label>
+          </div>
+          <div>
+            <input type="radio" id="rolHijo" name="rol" value="niño">
+            <label for="rolHijo">Hijo</label>
           </div>
         </div>
 
@@ -82,15 +86,18 @@
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+  <!-- In registrarse.html, update the script section -->
   <script type="module">
     // Import Firebase modules
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
 
     // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyBp5ot70jsbajD9bbMLl6EnWOpCDlnD7AU",
       authDomain: "esp32-db-460602.firebaseapp.com",
+      databaseURL: "https://esp32-fs.firebaseio.com",
       projectId: "esp32-db-460602",
       storageBucket: "esp32-db-460602.firebasestorage.app",
       messagingSenderId: "609313224766",
@@ -100,6 +107,7 @@
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
     // Get form element
     const registerForm = document.getElementById("registerForm");
@@ -109,9 +117,10 @@
       e.preventDefault();
 
       const name = document.getElementById("fullname").value.trim();
-      const email = document.getElementById("username").value.trim(); // Using username as email
+      const email = document.getElementById("username").value.trim();
       const pass = document.getElementById("password").value;
       const confirm = document.getElementById("confirmPassword").value;
+      const role = document.querySelector('input[name="rol"]:checked').value;
       const error = document.getElementById("error");
 
       // Validation
@@ -129,6 +138,15 @@
         // Create user with Firebase Auth
         const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
         const user = userCredential.user;
+
+        // Save additional user data to Firestore
+        await addDoc(collection(db, "users"), {
+          uid: user.uid,
+          name: name,
+          email: email,
+          role: role,
+          createdAt: new Date()
+        });
 
         // Success - redirect to main page
         alert("Cuenta creada correctamente para " + name);
@@ -153,7 +171,6 @@
       }
     });
   </script>
-
 </body>
 
 </html>

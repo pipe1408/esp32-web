@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Control</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .floor-plan {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4/3;
+            border: 2px solid #000;
+            margin-bottom: 15px;
+        }
+        
+        .room {
+            position: absolute;
+            border: 1px solid #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background-color: #f8f9fa;
+        }
+        
+        .room.on {
+            background-color: #ffc107;
+        }
+        
+        .bedroom {
+            top: 0;
+            left: 0;
+            width: 33%;
+            height: 40%;
+        }
+        
+        .bathroom {
+            top: 0;
+            left: 33%;
+            width: 20%;
+            height: 40%;
+        }
+        
+        .sala {
+            top: 0;
+            left: 53%;
+            width: 47%;
+            height: 100%;
+        }
+        
+        .cocina {
+            top: 70%;
+            left: 0;
+            width: 33%;
+            height: 30%;
+        }
+        
+        .comedor {
+            top: 70%;
+            left: 33%;
+            width: 20%;
+            height: 30%;
+        }
+        
+        .persiana-indicator {
+            position: absolute;
+            right: 0;
+            top: 40%;
+            width: 5%;
+            height: 20%;
+            border: 1px solid #000;
+            background-color: #f8f9fa;
+            font-size: 0.7em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .persiana-indicator span {
+            transform: rotate(90deg);
+            white-space: nowrap;
+        }
+        
+        .persiana-down {
+            background-color: #0d6efd;
+            color: white;
+        }
+    </style>
+</head>
+<body class="container py-3">
+    <h1 class="text-center mb-3">Casa ESP32</h1>
+    <p class= "text-center"><strong><span id="temp">--</span>°C</strong></p>
+    <p>Juliana Espinel, Laura Franco, Felipe Ballesteros</p>
+
+    <div class="mb-3">
+        <a href="/log" class="btn btn-warning">Ver Registro</a>
+    </div>
+
+    
+    <div class="floor-plan mb-3">
+        <div class="room bedroom" id="room">Room</div>
+        <div class="room bathroom" id="bath">Bathroom</div>
+        <div class="room sala" id="sala">
+            Sala
+            <div class="persiana-indicator" id="persiana-indicator"><span>Persiana</span></div>
+        </div>
+        <div class="room cocina" id="cocina">Cocina</div>
+        <div class="room comedor" id="comedor">Comedor</div>
+    </div>
+    
+    <div class="row g-2">
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Room</h5>
+                    <button class="btn btn-success btn-sm" onclick="controlLight('room', true)">ON</button>
+                    <button class="btn btn-danger btn-sm" onclick="controlLight('room', false)">OFF</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Bathroom</h5>
+                    <button class="btn btn-success btn-sm" onclick="controlLight('bath', true)">ON</button>
+                    <button class="btn btn-danger btn-sm" onclick="controlLight('bath', false)">OFF</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Sala</h5>
+                    <button class="btn btn-success btn-sm" onclick="controlLight('sala', true)">ON</button>
+                    <button class="btn btn-danger btn-sm" onclick="controlLight('sala', false)">OFF</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Cocina</h5>
+                    <button class="btn btn-success btn-sm" onclick="controlLight('cocina', true)">ON</button>
+                    <button class="btn btn-danger btn-sm" onclick="controlLight('cocina', false)">OFF</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Comedor</h5>
+                    <button class="btn btn-success btn-sm" onclick="controlLight('comedor', true)">ON</button>
+                    <button class="btn btn-danger btn-sm" onclick="controlLight('comedor', false)">OFF</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Persiana</h5>
+                    <button class="btn btn-primary btn-sm" onclick="controlPersiana('up')">UP</button>
+                    <button class="btn btn-primary btn-sm" onclick="controlPersiana('down')">DOWN</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let persianaState = 'up';
+        
+        function controlLight(room, isOn) {
+            const action = isOn ? 'on' : 'off';
+            const url = `/${room}-${action}`;
+            document.getElementById(room).classList.toggle('on', isOn);
+            fetch(url)
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+        
+        function controlPersiana(direction) {
+            const url = `/persiana-${direction}`;
+            persianaState = direction;
+            
+            const persianaIndicator = document.getElementById('persiana-indicator');
+            if (direction === 'down') {
+                persianaIndicator.classList.add('persiana-down');
+            } else {
+                persianaIndicator.classList.remove('persiana-down');
+            }
+            
+            fetch(url)
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function fetchTemperature() {
+            fetch('/temperature')
+            .then(response => response.text())
+            .then(temp => {
+                document.getElementById('temp').textContent = temp;
+            })
+            .catch(err => {
+                document.getElementById('temp').textContent = 'Error';
+                console.error("Error fetching temperature:", err);
+            });
+        }
+
+        setInterval(fetchTemperature, 5000);
+        fetchTemperature();
+    </script>
+</body>
+</html>

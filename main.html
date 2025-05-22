@@ -180,7 +180,7 @@
 
         function controlLight(room, isOn) {
             const action = isOn ? 'on' : 'off';
-            const url = `/${room}-${action}`;
+            const url = `house.savannahsbottler.lol/${room}-${action}`;
             document.getElementById(room).classList.toggle('on', isOn);
             fetch(url)
                 .catch(error => {
@@ -189,7 +189,7 @@
         }
 
         function controlPersiana(direction) {
-            const url = `/persiana-${direction}`;
+            const url = `house.savannahsbottler.lol/persiana-${direction}`;
             persianaState = direction;
 
             const persianaIndicator = document.getElementById('persiana-indicator');
@@ -206,7 +206,7 @@
         }
 
         function fetchTemperature() {
-            fetch('/temperature')
+            fetch('house.savannahsbottler.lol/temperature')
                 .then(response => response.text())
                 .then(temp => {
                     document.getElementById('temp').textContent = temp;
@@ -230,6 +230,7 @@
         const firebaseConfig = {
             apiKey: "AIzaSyBp5ot70jsbajD9bbMLl6EnWOpCDlnD7AU",
             authDomain: "esp32-db-460602.firebaseapp.com",
+            databaseURL: "https://esp32-fs.firebaseio.com",
             projectId: "esp32-db-460602",
             storageBucket: "esp32-db-460602.firebasestorage.app",
             messagingSenderId: "609313224766",

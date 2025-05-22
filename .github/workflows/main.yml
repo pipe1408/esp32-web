@@ -7,15 +7,14 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Deploy code to server
-        uses: appleboy/ssh-action@v1.0.0
+      - name: SSH Command
+        uses: D3rHase/ssh-command-action@v0.3.1
         with:
-          host: ${{ secrets.VM_HOST }}
-          port: 22
-          username: ${{ secrets.VM_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /var/www/html/esp32-web
-            git pull
+          host: ${{ secrets.SSH_HOST }}
+          user: ${{ secrets.SSH_USER }}
+          private_key: ${{ secrets.SSH_KEY }}
           host_fingerprint: ${{ secrets.VM_FINGERPRINT }}
+          command: cd /var/www/html/esp32-web && git pull
+          
